@@ -1,11 +1,16 @@
-
-
 import { GoogleGenAI } from "@google/genai";
 import { Challenge } from '../types';
 
-// FIX: Per coding guidelines, initialize with API key from process.env.API_KEY directly.
-// The API key MUST be obtained exclusively from the environment variable process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// FIX: Per coding guidelines, the API key MUST be obtained from process.env.API_KEY.
+// This replaces the use of import.meta.env.VITE_API_KEY.
+const API_KEY = process.env.API_KEY;
+
+if (!API_KEY) {
+  // This error will be caught if the environment variable is not set.
+  throw new Error("API_KEY environment variable not set. This is required for deployment.");
+}
+
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 export async function getPmBrainstorm(challenge: Challenge): Promise<string> {
   const optionsList = challenge.options.map((opt, index) => 
