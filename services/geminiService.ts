@@ -1,12 +1,11 @@
 
+
 import { GoogleGenAI } from "@google/genai";
 import { Challenge } from '../types';
 
-if (!process.env.API_KEY) {
-  console.error("API_KEY environment variable not set.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// FIX: Per coding guidelines, initialize with API key from process.env.API_KEY directly.
+// The API key MUST be obtained exclusively from the environment variable process.env.API_KEY.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export async function getPmBrainstorm(challenge: Challenge): Promise<string> {
   const optionsList = challenge.options.map((opt, index) => 
@@ -26,7 +25,6 @@ export async function getPmBrainstorm(challenge: Challenge): Promise<string> {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      // FIX: The 'contents' field should be a string for simple text prompts.
       contents: userQuery,
       config: {
         systemInstruction: systemPrompt
@@ -65,7 +63,6 @@ export async function generateFinalReport(delay: number, cost: number): Promise<
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      // FIX: The 'contents' field should be a string for simple text prompts.
       contents: userQuery,
       config: {
         systemInstruction: systemPrompt

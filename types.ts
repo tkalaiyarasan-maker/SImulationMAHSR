@@ -1,8 +1,14 @@
+export interface User {
+  name: string;
+  id: string;
+  role: 'guest' | 'admin';
+}
+
 export interface Option {
   label: string;
   impact: string;
-  delay: number;
-  cost: number;
+  delay: number; // in days
+  cost: number;  // in Cr
 }
 
 export interface Challenge {
@@ -19,28 +25,24 @@ export interface HistoryEntry {
   cost: number;
 }
 
-export interface GameState {
-  currentMonth: number;
-  totalDelayDays: number;
-  costOverrun: number;
-  currentChallengeIndex: number;
-  isDecisionPending: boolean;
-  isIntermission: boolean;
-  isGameOver: boolean;
-  history: HistoryEntry[];
-}
-
-export interface User {
-  name: string;
-  id: string;
-  role: 'guest' | 'admin';
-}
-
 export interface SimulationResult {
   userName: string;
   userId: string;
+  date: string;
   totalDelayDays: number;
   costOverrun: number;
-  date: string; // ISO string format
   outcome: string;
+}
+
+export interface Email {
+  id: number;
+  from: string;
+  subject: string;
+  body: string;
+  priority: number; // Lower number = higher priority
+}
+
+export interface EmailEvent {
+  round: number; // Appears AFTER this round
+  emails: Email[];
 }

@@ -1,16 +1,62 @@
-import { Challenge } from './types';
+import { Challenge, EmailEvent } from './types';
 
-export const TOTAL_MONTHS = 48; // Dec 2020 to Nov 2024
-export const START_MONTH_INDEX = 11; // 0-indexed, 11 is December
+export const TOTAL_MONTHS = 48;
 export const START_YEAR = 2020;
+export const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const START_MONTH_INDEX = 11;
+export const COST_RATE_PER_DAY_SAVED = 2; 
+export const INTERMISSION_DURATION = 10;
 
-export const MONTH_NAMES = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+export const PM_TIPS = [
+    "Use the **MoSCoW method** (Must, Should, Could, Won't) for prioritization.",
+    "Conduct **regular, short stand-up meetings** to ensure alignment.",
+    "Document decisions thoroughly to **avoid confusion** later on.",
+    "Break large tasks into smaller, **manageable chunks** (WBS).",
+    "Be vigilant: **scope creep** is the number one project killer.",
+    "Use a **parking lot** to defer discussions that derail the current meeting.",
+    "Always define **clear scope boundaries** before starting a project.",
+    "**Communicate** delays immediately, never wait until the last minute."
 ];
 
-export const COST_RATE_PER_DAY_SAVED = 2; // Reverted to original value
-export const INTERMISSION_DURATION = 10; // Reverted to original value
+export const EMAIL_EVENTS: EmailEvent[] = [
+    {
+        round: 4, // After round 4
+        emails: [
+            { id: 1, from: "NHSRCL Client", subject: "Urgent: Query onROW Clearance Progress", body: "Dear Project Director,\n\nWe require an immediate status update on the land acquisition delays near Surat. Please provide a detailed mitigation plan by EOD.\n\nRegards,\nClient Team", priority: 2 },
+            { id: 2, from: "Local Politician Office", subject: "Meeting Request: Community Concerns", body: "Sir,\n\nWe have received several complaints from local communities regarding construction dust and noise. We would like to schedule a meeting to discuss these issues at your earliest convenience.\n\nSincerely,\nOffice of the MLA", priority: 3 },
+            { id: 3, from: "Equipment Supplier", subject: "RE: Gantry Crane Maintenance Schedule", body: "Hi Team,\n\nJust a reminder to confirm the upcoming Q2 maintenance schedule for the casting yard gantry cranes. Let us know your preferred dates.\n\nThanks,\nSupplier Co.", priority: 4 },
+            { id: 4, from: "Chairman's Office", subject: "IMMEDIATE: Legal Notice Received", body: "URGENT ACTION REQUIRED.\n\nA legal notice has been received regarding environmental clearances for the project. The Chairman requires a briefing within the hour. Acknowledge receipt of this email immediately.\n\nRegards,\nChairman's Secretariat", priority: 1 },
+        ]
+    },
+    {
+        round: 9, // After round 9
+        emails: [
+            { id: 5, from: "HR Department", subject: "Reminder: Annual Performance Reviews", body: "Dear Department Heads,\n\nThis is a friendly reminder that the deadline for submitting annual performance reviews for your team members is next Friday. Please ensure all submissions are completed in the portal.\n\nBest,\nHR", priority: 4 },
+            { id: 6, from: "TCAP Engineer Team", subject: "Critical: Design Discrepancy in FSLM segment", body: "Project Director,\n\nOur team has identified a potential non-conformance in the rebar placement for the FSLM box girders produced yesterday. All related launching activities must be put on hold pending a joint inspection. Please confirm.\n\nRegards,\nTCAP Lead Engineer", priority: 1 },
+            { id: 7, from: "Finance Department", subject: "Query on Q3 Budget Overrun", body: "Sir,\n\nWe have noted a significant variance in the budget for temporary works this quarter. Please provide a justification for the cost overrun at your earliest convenience.\n\nThanks,\nFinance", priority: 3 },
+            { id: 8, from: "Local Media Outlet", subject: "Press Inquiry: Project Delays", body: "Dear Sir,\n\nWe are writing a story on the progress of the bullet train project and have heard reports of significant delays. We would appreciate an official comment from your office to ensure our reporting is accurate.\n\nThank you,\nJournalist", priority: 2 },
+        ]
+    },
+    {
+        round: 14, // After round 14
+        emails: [
+            { id: 9, from: "P1B Contractor Lead", subject: "Interface Clash at GAD-62", body: "Hi,\n\nOur team is unable to proceed with pier erection at GAD-62 as your team's scaffolding is obstructing our access. This is now on our critical path. Please arrange for its removal immediately.\n\nRegards,\nP1B Project Manager", priority: 1 },
+            { id: 10, from: "IT Department", subject: "Scheduled Server Maintenance", body: "Hello,\n\nPlease be advised that we will be conducting scheduled maintenance on the main project server this Saturday from 2 AM to 4 AM. Access to the project portal may be intermittent during this time. \n\nThanks,\nIT Support", priority: 4 },
+            { id: 11, from: "Japanese Consultant (JICA)", subject: "Request for Information: Quality Control Reports", body: "Dear Project Director,\n\nCould you please provide the latest QC reports for the concrete batching plants? We need to review them ahead of our monthly audit next week.\n\nBest Regards,\nJICA Team", priority: 2 },
+            { id: 12, from: "Weather Monitoring Service", subject: "Alert: Heavy Rainfall Forecast", body: "WEATHER ADVISORY:\n\nA period of intense monsoon rainfall is predicted for the Gujarat region over the next 48-72 hours. Please ensure all necessary precautions are taken at construction sites to mitigate potential flooding.\n\n- Weather Services", priority: 3 },
+        ]
+    },
+     {
+        round: 18, // After round 18
+        emails: [
+            { id: 13, from: "Safety Department", subject: "High Alert: Near-Miss Incident Report", body: "URGENT\n\nA near-miss incident was reported at the Vapi station site involving a crane operation. A full safety stand-down is required for all lifting operations across the site, effective immediately, pending a full investigation. Acknowledge this directive.\n\n- Head of Safety", priority: 1 },
+            { id: 14, from: "Logistics Team", subject: "Issue with Steel Delivery", body: "Team,\n\nThe shipment of specialized steel for the noise barriers has been delayed at the port due to customs issues. The estimated delay is currently 5-7 days. Just keeping you informed.\n\n- Logistics Lead", priority: 3 },
+            { id: 15, from: "NHSRCL Client", subject: "Re: Final Handover Documentation", body: "Dear Project Director,\n\nAs we approach the final stages, we want to ensure all handover documentation is being prepared in the agreed format. Please share a draft of the completion dossier for our review.\n\nRegards,\nClient Team", priority: 2 },
+            { id: 16, from: "Vendor (Canteen Services)", subject: "Unpaid Invoice", body: "Dear Sir,\n\nThis is a follow-up regarding invoice #743B for canteen services provided in the last month, which is now overdue. Please arrange for payment at the earliest.\n\nThank you,\nCanteen Services", priority: 4 },
+        ]
+    }
+];
+
 
 export const CHALLENGES: Challenge[] = [
     {
@@ -233,14 +279,4 @@ export const CHALLENGES: Challenge[] = [
             { label: "Offer TCAP/NHSRCL Staff High-Value Incentives", impact: "High, questionable cost, speeds up final sign-off.", delay: -50, cost: 200 }
         ]
     }
-];
-
-
-export const PM_TIPS: string[] = [
-  "<strong>Early Stakeholder Engagement</strong> is key to mitigating risks related to land acquisition and regulatory approvals.",
-  "A robust <strong>Risk Register</strong> should be a living document, updated regularly with mitigation strategies for new threats.",
-  "The <strong>Critical Path Method (CPM)</strong> helps identify which tasks have zero float and must be monitored closely to prevent schedule slippage.",
-  "Never underestimate the power of a clear <strong>Communication Plan</strong>. Keeping all stakeholders informed prevents misunderstandings and aligns expectations.",
-  "<strong>Earned Value Management (EVM)</strong> provides an integrated view of scope, schedule, and cost performance.",
-  "In large projects, investing in <strong>redundant supply chains</strong> for critical materials can be cheaper than a single-source disruption.",
 ];
