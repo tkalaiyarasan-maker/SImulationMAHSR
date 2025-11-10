@@ -1,0 +1,5 @@
+{
+  "name": "MAHSR Time Crunch Simulation",
+  "description": "A simulation game where you act as the Project Director for the Mumbai-Ahmedabad High-Speed Rail project, making critical decisions over a 4-year timeline. This AI-enhanced version uses Gemini to provide project management insights and generate a final project report.",
+  "requestFramePermissions": []
+}
