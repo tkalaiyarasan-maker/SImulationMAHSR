@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SimulationResult, AuthKey } from '../types';
-import { generateAuthKeyString } from '../services/keyService';
+import { generateAuthKey } from '../services/keyService';
 
 interface AdminDashboardProps {
     onLogout: () => void;
@@ -37,16 +37,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
     }, []);
 
     const handleGenerateKey = async () => {
-        const newKeyString = await generateAuthKeyString();
-        const parts = newKeyString.split('-');
-        const expiresAt = parseInt(parts[1], 10);
-        
-        const newKey: AuthKey = {
-            key: newKeyString,
-            createdAt: Date.now(),
-            expiresAt: expiresAt,
-        };
-        const updatedKeys = [...keys, newKey];
+        const newKeyObject = await generateAuthKey(); // Returns a complete AuthKey object
+        const updatedKeys = [...keys, newKeyObject];
         setKeys(updatedKeys);
         localStorage.setItem('authKeys', JSON.stringify(updatedKeys));
     };
