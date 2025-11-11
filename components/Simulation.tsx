@@ -195,7 +195,7 @@ const Simulation: React.FC<SimulationProps> = ({ user, onComplete, onLogout }) =
                     }}
                 />
                 
-                <div className="p-4 md:p-0">
+                <div className="p-4 md:p-8">
                     <Dashboard
                         timeDisplay={timeDisplay}
                         totalDelayDays={totalDelayDays}

@@ -2,13 +2,14 @@
 // The application now uses process.env.API_KEY, and the declaration below provides the necessary types.
 
 // FIX: To resolve the "Cannot redeclare block-scoped variable 'process'" error,
-// we augment the global scope instead of creating a new declaration. This avoids conflicts.
+// we augment the existing global `NodeJS.ProcessEnv` interface. This avoids conflicts
+// by merging our type definition with any existing definitions for `process.env`.
 declare global {
-  var process: {
-    env: {
+  namespace NodeJS {
+    interface ProcessEnv {
       API_KEY?: string;
-    };
-  };
+    }
+  }
 }
 
 // Adding an empty export treats this file as a module.

@@ -46,3 +46,9 @@ export interface EmailEvent {
   round: number; // Appears AFTER this round
   emails: Email[];
 }
+
+export interface AuthKey {
+  key: string;
+  createdAt: number;
+  expiresAt: number;
+}

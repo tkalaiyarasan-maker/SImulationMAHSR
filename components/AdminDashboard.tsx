@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SimulationResult } from '../types';
+import { SimulationResult, AuthKey } from '../types';
 
 interface AdminDashboardProps {
     onLogout: () => void;
@@ -7,6 +7,7 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
     const [results, setResults] = useState<SimulationResult[]>([]);
+    const [keys, setKeys] = useState<AuthKey[]>([]);
 
     useEffect(() => {
         try {
@@ -18,7 +19,41 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
             console.error("Failed to load simulation results:", error);
             setResults([]);
         }
+
+        try {
+            const storedKeys: AuthKey[] = JSON.parse(localStorage.getItem('authKeys') || '[]');
+            const activeKeys = storedKeys.filter(k => Date.now() < k.expiresAt);
+            setKeys(activeKeys);
+            if (activeKeys.length < storedKeys.length) {
+                localStorage.setItem('authKeys', JSON.stringify(activeKeys)); // Clean up expired keys
+            }
+        } catch (error) {
+            console.error("Failed to load auth keys:", error);
+            setKeys([]);
+        }
     }, []);
+
+    const generateRandomKey = (): string => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    };
+
+    const handleGenerateKey = () => {
+        const newKeyString = generateRandomKey();
+        const now = Date.now();
+        const newKey: AuthKey = {
+            key: newKeyString,
+            createdAt: now,
+            expiresAt: now + 48 * 60 * 60 * 1000, // 48 hours in milliseconds
+        };
+        const updatedKeys = [...keys, newKey];
+        setKeys(updatedKeys);
+        localStorage.setItem('authKeys', JSON.stringify(updatedKeys));
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8">
@@ -61,6 +96,48 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                             ))}
                         </tbody>
                     </table>
+                )}
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg mt-8">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-700">Access Key Management</h2>
+                    <button
+                        onClick={handleGenerateKey}
+                        className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                        Generate New Key
+                    </button>
+                </div>
+                {keys.length === 0 ? (
+                    <p className="text-gray-500">No active keys. Generate one to allow guest access.</p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-gray-500">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3">Key</th>
+                                    <th scope="col" className="px-6 py-3">Created At</th>
+                                    <th scope="col" className="px-6 py-3">Expires At</th>
+                                    <th scope="col" className="px-6 py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {keys.sort((a,b) => b.createdAt - a.createdAt).map((k) => (
+                                    <tr key={k.key} className="bg-white border-b hover:bg-gray-50">
+                                        <td className="px-6 py-4 font-mono font-bold text-gray-900">{k.key}</td>
+                                        <td className="px-6 py-4">{new Date(k.createdAt).toLocaleString()}</td>
+                                        <td className="px-6 py-4">{new Date(k.expiresAt).toLocaleString()}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full">
+                                                Active
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
         </div>

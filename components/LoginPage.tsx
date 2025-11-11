@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '../types';
+import { User, AuthKey } from '../types';
 
 interface LoginPageProps {
     onLogin: (user: User) => void;
@@ -10,16 +10,38 @@ const ADMIN_PASSWORD = 'Tka@2qwerty'; // Hardcoded for simplicity
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     const [name, setName] = useState('');
     const [id, setId] = useState('');
+    const [key, setKey] = useState('');
     const [adminPassword, setAdminPassword] = useState('');
     const [error, setError] = useState('');
 
     const handleGuestLogin = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        if (name.trim() && id.trim()) {
+        if (!name.trim() || !id.trim() || !key.trim()) {
+            setError('Please provide Name, PS Number, and a valid Key.');
+            return;
+        }
+
+        try {
+            const storedKeys: AuthKey[] = JSON.parse(localStorage.getItem('authKeys') || '[]');
+            const foundKey = storedKeys.find(k => k.key === key.trim());
+
+            if (!foundKey) {
+                setError('Invalid key. Please check the key and try again.');
+                return;
+            }
+
+            if (Date.now() > foundKey.expiresAt) {
+                setError('This key has expired. Please request a new one from the admin.');
+                return;
+            }
+            
+            // Key is valid
             onLogin({ name, id, role: 'guest' });
-        } else {
-            setError('Please provide both Name and PS Number.');
+
+        } catch (err) {
+            console.error("Failed to validate key:", err);
+            setError('An error occurred during key validation.');
         }
     };
 
@@ -93,6 +115,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                                         onChange={(e) => setId(e.target.value)}
                                         className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="e.g., LNT12345"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="key" className="text-sm font-medium text-gray-700">Key</label>
+                                    <input
+                                        id="key"
+                                        type="text"
+                                        value={key}
+                                        onChange={(e) => setKey(e.target.value)}
+                                        className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter your 6-character key"
                                         required
                                     />
                                 </div>
