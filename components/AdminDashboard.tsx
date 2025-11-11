@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SimulationResult, AuthKey } from '../types';
+import { generateAuthKeyString } from '../services/keyService';
 
 interface AdminDashboardProps {
     onLogout: () => void;
@@ -22,6 +23,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
 
         try {
             const storedKeys: AuthKey[] = JSON.parse(localStorage.getItem('authKeys') || '[]');
+            // For the new key system, we don't need to validate here, just display.
+            // But we still filter old expired keys for housekeeping.
             const activeKeys = storedKeys.filter(k => Date.now() < k.expiresAt);
             setKeys(activeKeys);
             if (activeKeys.length < storedKeys.length) {
@@ -33,22 +36,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
         }
     }, []);
 
-    const generateRandomKey = (): string => {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-        for (let i = 0; i < 6; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return result;
-    };
-
-    const handleGenerateKey = () => {
-        const newKeyString = generateRandomKey();
-        const now = Date.now();
+    const handleGenerateKey = async () => {
+        const newKeyString = await generateAuthKeyString();
+        const parts = newKeyString.split('-');
+        const expiresAt = parseInt(parts[1], 10);
+        
         const newKey: AuthKey = {
             key: newKeyString,
-            createdAt: now,
-            expiresAt: now + 48 * 60 * 60 * 1000, // 48 hours in milliseconds
+            createdAt: Date.now(),
+            expiresAt: expiresAt,
         };
         const updatedKeys = [...keys, newKey];
         setKeys(updatedKeys);

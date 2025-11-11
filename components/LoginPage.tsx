@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, AuthKey } from '../types';
+import { User } from '../types';
+import { validateAuthKey } from '../services/keyService';
 
 interface LoginPageProps {
     onLogin: (user: User) => void;
@@ -14,7 +15,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     const [adminPassword, setAdminPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleGuestLogin = (e: React.FormEvent) => {
+    const handleGuestLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         if (!name.trim() || !id.trim() || !key.trim()) {
@@ -23,22 +24,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         }
 
         try {
-            const storedKeys: AuthKey[] = JSON.parse(localStorage.getItem('authKeys') || '[]');
-            const foundKey = storedKeys.find(k => k.key === key.trim());
-
-            if (!foundKey) {
-                setError('Invalid key. Please check the key and try again.');
-                return;
+            const { isValid, message } = await validateAuthKey(key.trim());
+            if (isValid) {
+                onLogin({ name, id, role: 'guest' });
+            } else {
+                setError(message);
             }
-
-            if (Date.now() > foundKey.expiresAt) {
-                setError('This key has expired. Please request a new one from the admin.');
-                return;
-            }
-            
-            // Key is valid
-            onLogin({ name, id, role: 'guest' });
-
         } catch (err) {
             console.error("Failed to validate key:", err);
             setError('An error occurred during key validation.');
@@ -80,7 +71,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                                 Despite the technological and organizational advancements, Package C4 faced multiple delays due to interlinked technical, administrative, and environmental factors. The most significant contributors were delays in land acquisition and site access (up to 1078 days), hindrances within the Right of Way, and obstructions caused by DFCC material near the Surat Depot. Further disruptions arose from local encumbrances, utility shifting delays, and frequent design revisions. A large number of delay events were linked to Engineer’s directions and approvals, particularly concerning unconfirmed bearing capacities (UBC), ground condition mismatches, foundation design revisions, and reissued drawings for river bridges such as Tapi, Narmada, and Kolak.
                             </p>
                             <p>
-                                Natural events such as Cyclone Tauktae, intense monsoon rains, and the COVID-19 second and third waves added to the setbacks. Global supply chain disruptions, including floods and port congestion in China, delayed the delivery of essential FSLM moulds and launching equipment. Additionally, interfacing issues with adjacent contractors (P1B/C and E1), pipeline infringements, and design modifications at depots and approach lines led to further delays. Architectural and finishing works at Surat, Bilimora, and Vapi Stations also faced delays due to mock-up reviews, aesthetic revisions, and slow approvals for elements like façades, flooring, cladding, and fire systems. Other contributing factors included PSD (Platform Screen Door) integration, rolling stock interfacing, and variation instructions for noise barriers and depot facilities.
+                                Natural events such as Cyclone Tauktae, intense monsoon rains, and the COVID-19 second and third waves added to the setbacks. Global supply chain disruptions, including floods and port congestion in China, delayed the delivery of of essential FSLM moulds and launching equipment. Additionally, interfacing issues with adjacent contractors (P1B/C and E1), pipeline infringements, and design modifications at depots and approach lines led to further delays. Architectural and finishing works at Surat, Bilimora, and Vapi Stations also faced delays due to mock-up reviews, aesthetic revisions, and slow approvals for elements like façades, flooring, cladding, and fire systems. Other contributing factors included PSD (Platform Screen Door) integration, rolling stock interfacing, and variation instructions for noise barriers and depot facilities.
                             </p>
                              <p>
                                 In total, the project experienced a range of delay durations, from short-term hold-ups to extended impacts exceeding 1000 days, primarily driven by site handover constraints, design revisions, delayed approvals, coordination bottlenecks, and climatic challenges. However, through proactive steps such as TFL-based coordination, fast-tracked design approvals, and parallel execution strategies, the project has managed to maintain steady progress while ensuring adherence to high-speed rail standards and quality benchmarks.
@@ -126,7 +117,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                                         value={key}
                                         onChange={(e) => setKey(e.target.value)}
                                         className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Enter your 6-character key"
+                                        placeholder="Enter the access key from the admin"
                                         required
                                     />
                                 </div>
